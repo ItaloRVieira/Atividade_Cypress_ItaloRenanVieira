@@ -1,0 +1,22 @@
+{
+        "valido":
+        {
+        "email": "distefano74@gmail.com",
+        "password": "123456" 
+        },
+
+        "sememail":{
+        "email": "",
+        "password": "123456"         
+        },
+
+        "semsenha":{
+                "email": "cristianoronaldo@hotmail.com",
+                "password": ""         
+                },
+
+        "senhaincorreta":{
+                        "email": "cristianoronaldo@hotmail.com",
+                        "password": "19834834"         
+                        }
+}

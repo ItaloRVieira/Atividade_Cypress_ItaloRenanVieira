@@ -1,0 +1,53 @@
+{
+
+"UserValido": {
+    "name": "Anastacia da Silva",
+    "email": "distefano74@gmail.com",
+    "password": "123456"
+  },
+
+  "UserValido2": {
+    "name": "Anastacia da Silva",
+    "email": "distefano3@gmail.com",
+    "password": "123456"
+  },
+
+  "logEmailInvalido":{
+        
+    "name": "Anastacia da Silva",
+    "email": "1234gmail.com",
+    "password": "123456"
+  
+},
+
+  "logSenhamais12":{
+    "name": "Anastacia da Silva",
+    "email": "1234@gmail.com",
+    "password": "1234567891234"
+},
+
+  "logSenhamenos6":  {
+    "name": "Anastacia da Silva",
+    "email": "1234@gmail.com",
+    "password": "12345"
+},
+
+  "logSemName": {
+    "name": "",
+    "email": "1234@gmail.com",
+    "password": "123456"
+  },
+
+  "logSememail": {
+    "name": "Anastacia da Silva",
+    "email": "",
+    "password": "123456"
+  },
+
+  "logSemSenha": {
+    "name": "Anastacia da Silva",
+    "email": "1234@gmail.com",
+    "password": ""
+  }
+
+}  

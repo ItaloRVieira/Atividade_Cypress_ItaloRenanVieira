@@ -1,0 +1,10 @@
+{
+    "movieValido":
+    {
+        "title": "TROIA",
+        "genre": "GUERRA",
+        "description": "Guerra entre gregos e troianos por Helena, a mulher de Menelau",
+        "durationInMinutes": 163,
+        "releaseYear": 2004
+    }
+}  
