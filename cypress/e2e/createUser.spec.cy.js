@@ -1,160 +1,139 @@
 let userid
 let tokenid
 
-describe('Criando usuário', function(){
+describe('Criando usuário válido', function () {
 
 
-    it('Criando usuário valido', function(){
+    it('Criar usuário seguindo as regras de negócio deve retornar 201', function () {
         cy.criarUsuario()
-        .then(function (response){
-            expect(response.status).to.eq(201);
-            userid = response.body.id;
-            console.log(userid)
-        })
+            .then(function (response) {
+                expect(response.status).to.eq(201);
+                userid = response.body.id;
+            })
     });
 
-    after('Realizando login', function(){
+    after(function () {
         cy.loginValido()
-        .then(function (response) {
-            tokenid = response.body.accessToken;
-            console.log(tokenid)
-        })
-    });
-
-    after('Promover usuario', function(){
-        if (!tokenid) {
-            cy.log('Token de autenticação não foi obtido.');
-            assert.fail('Token de autenticação não foi obtido.');
-        }
-        cy.promoverAdmin(tokenid)
-    });
-
-    after('Excluir usuário', function () {
-        cy.excluirUsuario(userid, tokenid)
-      });
+            .then(function (response) {
+                tokenid = response.body.accessToken;
+                cy.promoverAdmin(tokenid);
+                cy.excluirUsuario(userid, tokenid)
+            });
+    })
 })
 
-describe('Criar usuários inválidos', function(){
-    it('Criar usuário com email inválido', function(){
+describe('Criar usuários inválidos', function () {
+    it('Criar usuário com email inválido deve retornar 400', function () {
         cy.fixture('createuser.json').then(function (newuser) {
-            cy.request({
-              method: 'POST',
-              url: '/api/users',
-              body: newuser.logEmailInvalido,
-        failOnStatusCode: false
-        }).then(function (response){
-            expect(response.status).to.eq(400);
-
-        })
-        });
-    });
-    it('Criar usuário com senha < 6', function(){
-        cy.fixture('createuser.json').then(function (newuser) {
-            cy.request({
-              method: 'POST',
-              url: '/api/users',
-              body: newuser.logSenhamenos6,
-        failOnStatusCode: false
-        }).then(function (response){
-            expect(response.status).to.eq(400);
-
-        })
-        });
-    });
-    it('Criar usuário com senha > 12', function(){
-        cy.fixture('createuser.json').then(function (newuser) {
-            cy.request({
-              method: 'POST',
-              url: '/api/users',
-              body: newuser.logSenhamais12,
-        failOnStatusCode: false
-        }).then(function (response){
-            expect(response.status).to.eq(400);
-
-        })
-        });
-    });
-    it('Criar usuário sem preencher NAME', function(){
-        cy.fixture('createuser.json').then(function (newuser) {
-            cy.request({
-              method: 'POST',
-              url: '/api/users',
-              body: newuser.logSemName,
-        failOnStatusCode: false
-        }).then(function (response){
-            expect(response.status).to.eq(400);
-
-        })
-        });
-    });
-    
-    it('Criar usuário sem preencher EMAIL', function(){
-        cy.fixture('createuser.json').then(function (newuser) {
-            cy.request({
-              method: 'POST',
-              url: '/api/users',
-              body: newuser.logSememail,
-        failOnStatusCode: false
-        }).then(function (response){
-            expect(response.status).to.eq(400);
-
-        })
-        });
-    });
-
-    it('Criar usuário sem preencher SENHA', function(){
-        cy.fixture('createuser.json').then(function (newuser) {
-            cy.request({
-              method: 'POST',
-              url: '/api/users',
-              body: newuser.logSemSenha,
-        failOnStatusCode: false
-        }).then(function (response){
-            expect(response.status).to.eq(400);
-
-        })
-        });
-    });
-})
-describe('Criando usuário com email existente', function(){
-
-
-    it('Ao criar usuário com email já existente deve retornar 409', function(){
-        cy.fixture('createuser.json').then(function (newuser) {
-            cy.request({
-              method: 'POST',
-              url: '/api/users',
-              body: newuser.UserValido
-        }).then(function (response){
-            userid = response.body.id;
-            console.log(userid)
-        }).then(function(){
             cy.request({
                 method: 'POST',
                 url: '/api/users',
-                body: newuser.UserValido,
-                failOnStatusCode: false 
-            }).then(function (response){
-                expect(response.status).to.eq(409)
+                body: newuser.logEmailInvalido,
+                failOnStatusCode: false
+            }).then(function (response) {
+                expect(response.status).to.eq(400);
+
             })
-        })
-    }); 
-    });
-    after('Realizando login', function(){
-        cy.loginValido()
-        .then(function (response) {
-            tokenid = response.body.accessToken;
-            console.log(tokenid)
-        }).then('Promover usuario', function(){
-            if (!tokenid) {
-                cy.log('Token de autenticação não foi obtido.');
-                assert.fail('Token de autenticação não foi obtido.');
-            }
-            cy.promoverAdmin(tokenid)
-            .then('Excluir usuário', function () {
-                cy.excluirUsuario(userid, tokenid)
-              });
         });
+    });
+    it('Criar usuário com senha < 6 caracteres deve retornar 400', function () {
+        cy.fixture('createuser.json').then(function (newuser) {
+            cy.request({
+                method: 'POST',
+                url: '/api/users',
+                body: newuser.logSenhamenos6,
+                failOnStatusCode: false
+            }).then(function (response) {
+                expect(response.status).to.eq(400);
+
+            })
+        });
+    });
+    it('Criar usuário com senha > 12 caracteres deve retornar 400', function () {
+        cy.fixture('createuser.json').then(function (newuser) {
+            cy.request({
+                method: 'POST',
+                url: '/api/users',
+                body: newuser.logSenhamais12,
+                failOnStatusCode: false
+            }).then(function (response) {
+                expect(response.status).to.eq(400);
+
+            })
+        });
+    });
+    it('Criar usuário sem preencher NAME deve retornar 400', function () {
+        cy.fixture('createuser.json').then(function (newuser) {
+            cy.request({
+                method: 'POST',
+                url: '/api/users',
+                body: newuser.logSemName,
+                failOnStatusCode: false
+            }).then(function (response) {
+                expect(response.status).to.eq(400);
+
+            })
+        });
+    });
+
+    it('Criar usuário sem preencher EMAIL deve retornar 400', function () {
+        cy.fixture('createuser.json').then(function (newuser) {
+            cy.request({
+                method: 'POST',
+                url: '/api/users',
+                body: newuser.logSememail,
+                failOnStatusCode: false
+            }).then(function (response) {
+                expect(response.status).to.eq(400);
+
+            })
+        });
+    });
+
+    it('Criar usuário sem preencher SENHA deve retornar 400', function () {
+        cy.fixture('createuser.json').then(function (newuser) {
+            cy.request({
+                method: 'POST',
+                url: '/api/users',
+                body: newuser.logSemSenha,
+                failOnStatusCode: false
+            }).then(function (response) {
+                expect(response.status).to.eq(400);
+
+            })
+        });
+    });
+})
+describe('Criando usuário com email existente', function () {
+
+
+    it('Ao criar usuário com email já existente deve retornar 409', function () {
+        cy.fixture('createuser.json').then(function (newuser) {
+            cy.request({
+                method: 'POST',
+                url: '/api/users',
+                body: newuser.UserValido
+            }).then(function (response) {
+                userid = response.body.id;
+            }).then(function () {
+                cy.request({
+                    method: 'POST',
+                    url: '/api/users',
+                    body: newuser.UserValido,
+                    failOnStatusCode: false
+                }).then(function (response) {
+                    expect(response.status).to.eq(409)
+                })
+            })
+        });
+    });
+    after(function () {
+        cy.loginValido()
+            .then(function (response) {
+                tokenid = response.body.accessToken;
+                cy.promoverAdmin(tokenid);
+                cy.excluirUsuario(userid, tokenid)
+            });
     });
 })
 

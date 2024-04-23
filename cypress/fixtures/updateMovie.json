@@ -1,0 +1,37 @@
+{
+    "updateValido":{
+        "title": "TROIAxSPARTA",
+        "genre": "Guerra/Romance",
+        "description": "Guerra entre gregos e troianos, por Helena, a mulher de Menelau",
+        "durationInMinutes": 120,
+        "releaseYear": 2005
+      },
+      "updateDurationNegative":{
+        "title": "TROIAxSPARTA",
+        "genre": "Guerra/Romance",
+        "description": "Guerra entre gregos e troianos, por Helena, a mulher de Menelau",
+        "durationInMinutes": -15,
+        "releaseYear": 2005
+      },
+      "updateReleaseFutura":{
+        "title": "TROIAxSPARTA",
+        "genre": "Guerra/Romance",
+        "description": "Guerra entre gregos e troianos, por Helena, a mulher de Menelau",
+        "durationInMinutes": -15,
+        "releaseYear": 2005
+      },
+      "updateDuracaoZero":{
+        "title": "TROIAxSPARTA",
+        "genre": "Guerra/Romance",
+        "description": "Guerra entre gregos e troianos, por Helena, a mulher de Menelau",
+        "durationInMinutes": 0,
+        "releaseYear": 2005
+      },
+      "updateReleaseZero":{
+        "title": "TROIAxSPARTA",
+        "genre": "Guerra/Romance",
+        "description": "Guerra entre gregos e troianos, por Helena, a mulher de Menelau",
+        "durationInMinutes": 160,
+        "releaseYear": 0
+      }
+}

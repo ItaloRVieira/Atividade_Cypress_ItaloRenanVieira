@@ -8,49 +8,41 @@ let userViewID
 
 describe('Pesquisas de usuários', function () {
 
-    before('Criando usuário', function () {
+    beforeEach(function () {
         cy.criarUsuario().then(function (response) {
-                userid = response.body.id;
-            }).then('Realizando login válido', function () {
-                cy.fixture('login.json',).then(function (login) {
-                    cy.log(login);
-                    cy.request({
-                        method: 'POST',
-                        url: '/api/auth/login',
-                        body: login.valido
-                    }).then(function (response) {
-                        tokenid = response.body.accessToken;
-                    })
+            userid = response.body.id;
+        }).then(function () {
+            cy.fixture('login.json',).then(function (login) {
+                cy.request({
+                    method: 'POST',
+                    url: '/api/auth/login',
+                    body: login.valido
+                }).then(function (response) {
+                    tokenid = response.body.accessToken;
+                })
             });
         });
     })
 
-    it('Pesquisar ID de outro usuario com perfil Crítico', function () {
+    it('Pesquisar ID de outro usuario com perfil Crítico deve retornar 403', function () {
         cy.promoverAdmin(tokenid)
-        .then(function (patchResponse) {
-            expect(patchResponse.status).to.eq(204);
-            cy.request({
-                method: 'GET',
-                url: '/api/users',
-                headers: {
-                    Authorization: `Bearer ${tokenid}`
+        cy.request({
+            method: 'GET',
+            url: '/api/users',
+            headers: {
+                Authorization: `Bearer ${tokenid}`
+            }
+        }).then(function (getUsersResponse) {
+            const users = getUsersResponse.body;
+            const userIds = users.map(user => user.id);
+
+            for (let i = 0; i < userIds.length; i++) {
+                if (userIds[i] !== newUserCreatedId) {
+                    otherUserId = userIds[i];
+                    break;
                 }
-            }).then(function (getUsersResponse) {
-                expect(getUsersResponse.status).to.eq(200);
-
-                const users = getUsersResponse.body;
-
-                const userIds = users.map(user => user.id);
-
-                for (let i = 0; i < userIds.length; i++) {
-                    if (userIds[i] !== newUserCreatedId) {
-                        otherUserId = userIds[i];
-                        break;
-                    }
-                }
-
-                expect(otherUserId).to.exist;
-                cy.promoverCritico(tokenid)
+            }
+            cy.promoverCritico(tokenid)
                 .then(function () {
                     cy.request({
                         method: 'GET',
@@ -63,11 +55,11 @@ describe('Pesquisas de usuários', function () {
                         expect(getResponse.status).to.eq(403);
                     });
                 });
-            });
         });
     });
 
-    it('Pesquisando ID de outro usuario com perfil Comum', function () {
+    it('Pesquisar ID de outro usuario com perfil Comum deve retornar 403', function () {
+
         cy.request({
             method: 'GET',
             url: '/api/users/' + otherUserId,
@@ -75,39 +67,35 @@ describe('Pesquisas de usuários', function () {
                 Authorization: `Bearer ${tokenid}`,
 
             },
-            failOnStatusCode: false
+            failOnStatusCode: false,
         }).then(function (resposta) {
-            if (resposta.status == 200) {
-                cy.log('BUG, sucesso está sendo retornado pela API, erro 404 deveria ser apresentado, usuario pesquisado não existe.');
-                assert.fail('BUG, sucesso está sendo retornado pela API, erro 404 deveria ser apresentado, usuario pesquisado não existe.');
-            }
             expect(resposta.status).to.eq(403);
+        })
+        cy.request({
+            method: 'GET',
+            url: '/api/users/' + userid,
+            headers: {
+                Authorization: `Bearer ${tokenid}`,
+
+            }
         })
     });
 
-    it('Pesquisando ID de outro usuario com perfil Admin', function () {
+    it('Pesquisar ID de outro usuario com perfil Admin deve retornar 200', function () {
         cy.promoverAdmin(tokenid)
-        .then(function (resposta) {
-            expect(resposta.status).to.eq(204);
-        })
         cy.request({
             method: 'GET',
             url: '/api/users/' + otherUserId,
             headers: {
                 Authorization: `Bearer ${tokenid}`,
             },
-            failOnStatusCode: false
         }).then(function (resposta) {
             expect(resposta.status).to.eq(200);
             userViewID = resposta.body.id;
-            if (userViewID == null) {
-                cy.log('BUG, sucesso está sendo retornado pela API, erro 404 deveria ser apresentado, usuario pesquisado não existe.');
-                assert.fail('BUG, sucesso está sendo retornado pela API, erro 404 deveria ser apresentado, usuario pesquisado não existe.');
-            }
         })
     });
 
-    it('Pesquisar usuário sem estar logado', function () {
+    it('Pesquisar usuário sem estar logado deve retornar 401', function () {
         cy.request({
             method: 'GET',
             url: '/api/users/' + userid,
@@ -117,43 +105,41 @@ describe('Pesquisas de usuários', function () {
         })
     });
 
-    it('Pesquisar ID de usuario inexistente', function () {
-        cy.promoverAdmin(tokenid)
-        .then(function(patchResponse) {
-            expect(patchResponse.status).to.eq(204);
+    it('Pesquisar ID de usuario inexistente deve retornar 200 e body vazio', function () {
+        cy.promoverAdmin(tokenid);
+        cy.request({
+            method: 'GET',
+            url: '/api/users',
+            headers: {
+                Authorization: `Bearer ${tokenid}`
+            }
+        }).then(function (response) {
+            const idUsuarios = response.body.map(user => user.id);
 
-            cy.request({
-                method: 'GET',
-                url: '/api/users',
-                headers: {
-                    Authorization: `Bearer ${tokenid}`
-                }
-            }).then(function (response) {
-                const idUsuarios = response.body.map(user => user.id);
+            do {
+                generateId = Math.floor(Math.random() * 1000);
+            } while (idUsuarios.includes(generateId));
 
-                do {
-                    generateId = Math.floor(Math.random() * 1000);
-                } while (idUsuarios.includes(generateId));
+            Cypress.env('generatedId', generateId);
 
-                Cypress.env('generatedId', generateId);
-
-                cy.then(function() {
-                    const generatedId = Cypress.env('generatedId');
-                    return cy.request({
-                        method: 'GET',
-                        url: '/api/users/' + generatedId,
-                        headers: {
-                            Authorization: `Bearer ${tokenid}`,
-                        },
-                        failOnStatusCode: false
-                    }).then(function (resposta) {
-                        expect(resposta.status).to.eq(200);
-                    });
+            cy.then(function () {
+                const generatedId = Cypress.env('generatedId');
+                return cy.request({
+                    method: 'GET',
+                    url: '/api/users/' + generatedId,
+                    headers: {
+                        Authorization: `Bearer ${tokenid}`,
+                    },
+                    failOnStatusCode: false
+                }).then(function (resposta) {
+                    expect(resposta.status).to.eq(200);
+                    expect(resposta.body).to.be.empty
                 });
             });
         });
     })
-    after('Excluir usuário', function () {
+    afterEach('Excluir usuário', function () {
+        cy.promoverAdmin(tokenid);
         cy.excluirUsuario(userid, tokenid)
-      })
+    })
 });

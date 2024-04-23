@@ -1,61 +1,62 @@
-const { expect } = require("chai")
 const { faker } = require('@faker-js/faker');
 
-describe('Pesquisar por filmes com perfil admin', function() {
+describe('Pesquisar por filmes com perfil admin', function () {
     let userid;
     let tokenid;
-    let movietitle;
+    let movieTitle;
     let notTitleMovie;
 
-    before('Criando usuário válido, realizando login, promovendo para admin e criando filme', function() {
+    before(function () {
         cy.criarUsuario()
-        .then(function(response) {
-                expect(response.status).to.eq(201);
+            .then(function (response) {
                 userid = response.body.id;
-                console.log(userid);
-
                 cy.loginValido()
-                    .then(function(response) {
+                    .then(function (response) {
                         tokenid = response.body.accessToken;
-                        console.log(tokenid);
                         cy.promoverAdmin(tokenid);
-                        cy.fixture('movies.json').then(function(newmovie) {
+                        cy.fixture('movies.json').then(function (newmovie) {
+                            movieTitle = newmovie.movieValido.title, 
                             cy.request({
                                 method: 'POST',
                                 url: '/api/movies',
-                                body: newmovie.movieValido,
+                                body: newmovie.movieValido,  
                                 headers: {
                                     Authorization: `Bearer ${tokenid}`
-                                }
-                            }).then(function(responseMovie) {
-                                console.log(responseMovie);
-                                expect(responseMovie.status).to.eq(201);
-                            });
+                                },
+                            })
+                        });
                     });
             });
-        });
     });
 
-    after('Excluir usuário', function() {
+    after(function () {
         cy.excluirUsuario(userid, tokenid);
     });
 
-    it('Consultando filme válido', function() {
+    it('Consultar filme válido deve retornar 200', function () {
         cy.request({
             method: 'GET',
-            url: '/api/movies/search?title=' + movietitle,
+            url: '/api/movies/search?title=' + movieTitle,
             headers: {
                 Authorization: `Bearer ${tokenid}`
             }
-        });
+        }).then(function (resposta) {
+            expect(resposta.status).to.eq(200);
+            expect(resposta.body).to.be.a("array");
+            expect(resposta.body[0]).to.have.property("title");
+            expect(resposta.body[0]).to.have.property("genre");
+            expect(resposta.body[0]).to.have.property("durationInMinutes");
+            expect(resposta.body[0]).to.have.property("id");
+            expect(resposta.body[0]).to.have.property("description");
+
+        })
     });
 
-    it('Consultando filme não existente', function() {
+    it('Consulta filme não existente retorna 200', function () {
         cy.request({
             method: 'GET',
             url: '/api/movies',
-        }).then(function(response) {
-            expect(response.status).to.eq(200);
+        }).then(function (response) {
 
             const listarFilmes = response.body;
             const titleMovie = listarFilmes.map(filme => filme.title);
@@ -66,9 +67,10 @@ describe('Pesquisar por filmes com perfil admin', function() {
 
             cy.request({
                 method: 'GET',
-                url: '/api/movies/search?title=' + notTitleMovie
-            }).then(function(response) {
-                expect(response.status).to.eq(200);
+                url: '/api/movies/search?title=' + notTitleMovie,
+            }).then(function (responseMovie) {
+                expect(responseMovie.status).to.eq(200);
+                expect(responseMovie.body).to.be.empty;
             });
         });
     });

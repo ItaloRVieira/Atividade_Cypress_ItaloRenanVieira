@@ -6,5 +6,39 @@
         "description": "Guerra entre gregos e troianos por Helena, a mulher de Menelau",
         "durationInMinutes": 163,
         "releaseYear": 2004
-    }
+    },
+
+    "movieTimeNegativo":
+    {
+        "title": "O Resgate do soldado Ryan",
+        "genre": "GUERRA",
+        "description": "WW2",
+        "durationInMinutes": -18,
+        "releaseYear": 1998
+    },
+    "movieDataFutura":  {
+        "title": "Bastardos Inglórios",
+        "genre": "GUERRA",
+        "description": "WW2",
+        "durationInMinutes": 153,
+        "releaseYear": 2005
+    },
+
+    "movieTimeZerado": {
+            "title": "Harry Potter e o Calice de Fogo",
+            "genre": "Fantasia",
+            "description": "Escola de bruxos",
+            "durationInMinutes": 0,
+            "releaseYear": 2005      
+    },
+
+    "movieAnoZerado": {
+        "title": "O Pequenino",
+        "genre": "Comedia",
+        "description": "Comedia com os irmãos Wayans",
+        "durationInMinutes": 98,
+        "releaseYear": 0      
+}
+
+
 }  
